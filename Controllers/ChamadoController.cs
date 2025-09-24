@@ -20,12 +20,27 @@ namespace ApiServico.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> BuscarTodos()
+        public async Task<IActionResult> BuscarTodos([FromQuery] string? search, [FromQuery] string? situacao)
         {
-            var chamados = await _context.Chamados.ToListAsync();
+            var query = _context.Chamados.AsQueryable();
+            //List<Chamado> chamados;
+            if(search is not null)
+            {
+                query = query.Where(x=>x.Titulo.Contains(search));
+                //chamados = await _context.Chamados
+                //    .Where(x=> x.Titulo.Contains(search)).ToListAsync();
+                //return Ok(chamados);
+            }
+            if(situacao is not null)
+            {
+                query = query.Where(x => x.Status.Contains(situacao));
 
+            }
+            //chamados = await _context.Chamados.ToListAsync();
+            var chamados = await query.ToListAsync();
             return Ok(chamados);
         }
+      
 
 
         [HttpGet("{id}")]
